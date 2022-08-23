@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exe4j version="6.0.2" transformSequenceNumber="2">
+  <directoryPresets config="D:/Project/fastWorkplace/out/artifacts/fastWorkplace_jar2" />
+  <application name="fwp" distributionSourceDir="D:/Project/fastWorkplace/out/exe">
+    <languages>
+      <principalLanguage id="en" customLocalizationFile="" />
+    </languages>
+  </application>
+  <executable name="fastworkplace" type="2" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="java9+" amd64="true">
+    <messageSet />
+    <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" companyName="" productVersion="" />
+  </executable>
+  <splashScreen show="false" width="0" height="0" bitmapFile="" textOverlay="false">
+    <text>
+      <statusLine x="20" y="20" text="" fontSize="8" fontColor="0,0,0" bold="false" />
+      <versionLine x="20" y="40" text="version %VERSION%" fontSize="8" fontColor="0,0,0" bold="false" />
+    </text>
+  </splashScreen>
+  <java mainClass="fastWorkPlace" mainMode="1" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true" minVersion="17" maxVersion="" allowBetaVM="false" jdkOnly="false">
+    <searchSequence>
+      <directory location="./openjdk-17.0.1" />
+    </searchSequence>
+    <classPath>
+      <archive location="D:/Project/fastWorkplace/out/artifacts/fastWorkplace_jar2/fastWorkplace.jar" failOnError="false" />
+      <archive location="D:/Project/murinjTK/out/artifacts/murinjTK/murinjTK.jar" failOnError="false" />
+      <archive location="C:/Users/myj/.m2/repository/com/alibaba/fastjson/1.1.23/fastjson-1.1.23.jar" failOnError="false" />
+    </classPath>
+    <modulePath />
+    <nativeLibraryDirectories />
+    <vmOptions />
+  </java>
+  <includedFiles />
+  <unextractableFiles />
+</exe4j>
