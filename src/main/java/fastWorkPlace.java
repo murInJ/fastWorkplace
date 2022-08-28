@@ -2,13 +2,10 @@
 import IO.FileTK;
 import Web.op;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @title: fastWorkPlace
@@ -18,60 +15,90 @@ import java.util.List;
  */
 
 public class fastWorkPlace {
+    public static workSpace workspace;
+    public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        if (!FileTK.check(".\\config.json", false)) {
-            FileTK.writeFile(".\\config.json", JSON.toJSONString(getExampleConfig()));
-            System.out.println("请配置config.json");
-            Thread.sleep(3000);
+        if (!FileTK.check(".\\workSpace.json", false)) {
+            FileTK.writeFile(".\\workSpace.json", JSON.toJSONString(new workSpace(), SerializerFeature.WriteMapNullValue));
+            System.out.println("请配置workSpace.json");
+            Thread.sleep(2000);
             System.exit(0);
         } else {
-            String jsonStr = FileTK.readFile(".\\config.json");
-            JSONObject config = JSON.parseObject(jsonStr);
-            String currentWorkplace = config.getString("currentWorkplace");
-            JSONArray workplaces = config.getJSONArray("workplaces");
-
-            for (Object workplace : workplaces.toArray()) {
-                JSONObject wp = (JSONObject) workplace;
-                String wpName = wp.getString("name");
-                if (wpName.equals(currentWorkplace)) {
-                    JSONArray softwares = wp.getJSONArray("softwares");
-                    JSONArray urls = wp.getJSONArray("urls");
-                    for (int i = 0; i < softwares.size(); ++i) {
-                        FileTK.execFile(softwares.getString(i));
-                    }
-                    for (int i = 0; i < urls.size(); ++i) {
-                        op.openInBrowser(urls.getString(i));
-                    }
-                    System.exit(0);
+            String jsonStr = FileTK.readFile(".\\workSpace.json");
+            workspace = workSpace.readWorkSpace(jsonStr);
+            while (true) {
+                String command = scanner.nextLine();
+                String hk = workspace.getHk().getHotkey(command);
+                if (hk != null) {
+                    workspace.setCurrentWorkplace(hk);
+                    if(execCommand(""))break;
                 }
+                else{
+                    if(execCommand(command))break;
+                }
+
+
+
+                FileTK.writeFile(".\\workSpace.json", JSON.toJSONString(workspace, SerializerFeature.WriteMapNullValue));
             }
         }
-    }
-    public static HashMap<String, Object> getExampleConfig(){
-        String currentWorkplace = "example workPlace1_name";
-        List<Object> workplaces = new ArrayList<>();
-
-        List<String> urls = new ArrayList<>();
-        urls.add("example url1");
-        urls.add("example url2");
-
-        List<String> softwares = new ArrayList<>();
-        softwares.add("example softwarePath1");
-        softwares.add("example softWarePath2");
-
-        HashMap<String,Object> workPlace1 = new HashMap<>();
-        workPlace1.put("urls",urls);
-        workPlace1.put("softwares",softwares);
-        workPlace1.put("name","example workPlace1_name");
-
-        workplaces.add(workPlace1);
-
-        HashMap<String,Object> exampleConfig = new HashMap<>();
-        exampleConfig.put("currentWorkplace","example workPlace1_name") ;
-        exampleConfig.put("workplaces",workplaces);
-
-        return exampleConfig;
 
     }
+
+    public static Boolean execCommand(String command) {
+        String[] cmds = command.split(" ");
+        if (cmds.length == 1) {
+            String key = cmds[0];
+            if (key.equals("")) {
+                String currentWorkplace = workspace.getCurrentWorkplace();
+                if (workspace.getWorkPlaces().containsKey(currentWorkplace)) {
+                    workPlace workplace = workspace.getWorkPlaces().get(currentWorkplace);
+                    for (String software : workplace.softwares) {
+                        FileTK.execFile(software);
+                    }
+                    for (String url : workplace.urls) {
+                        op.openInBrowser(url);
+                    }
+                    return true;
+                } else {
+                    System.out.println("current workplace not set.");
+                }
+            }
+            if (key.equals("quit")) {
+                return true;
+            } else {
+                System.out.println("unknown command.");
+            }
+        } else if (cmds.length == 2) {
+            String op = cmds[0];
+            String arg = cmds[1];
+            switch (op) {
+                case "new" -> workspace.newWorkplace(arg);
+                case "remove" -> workspace.removeWorkplace(arg);
+                case "use" -> workspace.useWorkPlace(arg);
+                case "add" -> workspace.addWorkPlace(workspace.getCurrentWorkplace(), arg);
+                case "clear" -> workspace.getHk().clearHotkey(arg);
+                default -> System.out.println("unknown command.");
+            }
+        } else if (cmds.length == 3) {
+            String op = cmds[0];
+            String arg1 = cmds[1];
+            String arg2 = cmds[2];
+            if (op.equals("set")) {
+                if (workspace.getWorkPlaces().containsKey(arg2)) {
+                    workspace.getHk().setHotkey(arg1, arg2);
+                } else {
+                    System.out.println("workplace not exist.");
+                }
+            } else {
+                System.out.println("unknown command.");
+            }
+        } else {
+            System.out.println("unknown command.");
+        }
+        return false;
+    }
+
 }
+
